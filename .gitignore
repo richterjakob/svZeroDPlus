@@ -17,6 +17,11 @@ __pycache__
 *.vscode
 public
 
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
 # Documentation
 docs/html
 docs/python/source/*.rst

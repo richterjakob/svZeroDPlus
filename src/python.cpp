@@ -35,9 +35,17 @@
 
 #include "../src/main.hpp"
 
-PYBIND11_MODULE(libsvzerodplus, mod) {
+pybind11::object dumps = pybind11::module_::import("ujson").attr("dumps");
+pybind11::object read_csv = pybind11::module_::import("pandas").attr("read_csv");
+pybind11::object StringIO = pybind11::module_::import("io").attr("StringIO");
+
+using namespace pybind11::literals;
+
+PYBIND11_MODULE(pysvzerodplus, mod) {
   mod.doc() = "svZeroDPlus";
-  mod.def("run", [](std::string& json_config) {
-    return pybind11::bytes(run(json_config));
+  mod.def("run", [](pybind11::dict& config_dict) {
+    pybind11::str json_config_py = dumps(config_dict);
+    std::string json_config = json_config_py;
+    return read_csv(StringIO(run(json_config)), "engine"_a="pyarrow");
   });
 }

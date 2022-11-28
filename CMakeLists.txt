@@ -48,12 +48,12 @@ endif()
 # Set executable and python library
 # -----------------------------------------------------------------------------
 add_executable(svzerodplus src/main.cpp)
-pybind11_add_module(libsvzerodplus svzerodplus/libsvzerodplus.cpp)
+pybind11_add_module(pysvzerodplus src/python.cpp)
 
 # -----------------------------------------------------------------------------
 # Link libraries
 # -----------------------------------------------------------------------------
 target_link_libraries(svzerodplus PRIVATE Eigen3::Eigen)
 target_link_libraries(svzerodplus PRIVATE simdjson)
-target_link_libraries(libsvzerodplus PRIVATE Eigen3::Eigen)
-target_link_libraries(libsvzerodplus PRIVATE simdjson)
+target_link_libraries(pysvzerodplus PRIVATE Eigen3::Eigen)
+target_link_libraries(pysvzerodplus PRIVATE simdjson)
