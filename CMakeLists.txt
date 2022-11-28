@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-project(svZeroDSolver)
+project(svZeroDPlus)
 include(FetchContent)
 
 # -----------------------------------------------------------------------------
@@ -47,13 +47,13 @@ endif()
 # -----------------------------------------------------------------------------
 # Set executable and python library
 # -----------------------------------------------------------------------------
-add_executable(svzerodsolver src/main.cpp)
-pybind11_add_module(libsvzerodsolver src/python.cpp)
+add_executable(svzerodplus src/main.cpp)
+pybind11_add_module(libsvzerodplus svzerodplus/libsvzerodplus.cpp)
 
 # -----------------------------------------------------------------------------
 # Link libraries
 # -----------------------------------------------------------------------------
-target_link_libraries(svzerodsolver PRIVATE Eigen3::Eigen)
-target_link_libraries(svzerodsolver PRIVATE simdjson)
-target_link_libraries(libsvzerodsolver PRIVATE Eigen3::Eigen)
-target_link_libraries(libsvzerodsolver PRIVATE simdjson)
+target_link_libraries(svzerodplus PRIVATE Eigen3::Eigen)
+target_link_libraries(svzerodplus PRIVATE simdjson)
+target_link_libraries(libsvzerodplus PRIVATE Eigen3::Eigen)
+target_link_libraries(libsvzerodplus PRIVATE simdjson)

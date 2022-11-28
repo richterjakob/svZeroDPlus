@@ -33,10 +33,10 @@
  */
 #include <pybind11/pybind11.h>
 
-#include "main.hpp"
+#include "../src/main.hpp"
 
-PYBIND11_MODULE(libsvzerodsolver, mod) {
-  mod.doc() = "svZeroDSolver";
+PYBIND11_MODULE(libsvzerodplus, mod) {
+  mod.doc() = "svZeroDPlus";
   mod.def("run", [](std::string& json_config) {
     return pybind11::bytes(run(json_config));
   });

@@ -1,10 +1,9 @@
 import json
 import os
-from subprocess import call
-from tempfile import TemporaryDirectory
 
 import numpy as np
-import pandas as pd
+
+from svzerodplus import run_from_config
 
 this_file_dir = os.path.abspath(os.path.dirname(__file__))
 cpp_exec = os.path.join(this_file_dir, "..", "Release", "svzerodsolver")
@@ -20,13 +19,10 @@ def run_test_case_by_name(name):
         name: Name of the test case.
         testdir: Directory for performing the simulation.
     """
-    testfile = os.path.join(this_file_dir, "cases", name + ".json")
-    with TemporaryDirectory() as tempdir:
-        outfile = os.path.join(tempdir, "output.csv")
-        call([cpp_exec, testfile, outfile])
-        result = pd.read_csv(outfile)
+    testfile = os.path.join(os.path.dirname(__file__), "cases", name + ".json")
     with open(testfile) as ff:
         config = json.load(ff)
+    result = run_from_config(config)
 
     output = {
         "pressure_in": {},
