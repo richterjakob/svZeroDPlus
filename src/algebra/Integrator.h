@@ -82,6 +82,7 @@ class Integrator {
   Model* model;
 
  public:
+  int non_lin_iter = 0;
   /**
    * @brief Construct a new Integrator object
    *

@@ -93,6 +93,7 @@ void Solver::run() {
       interval_counter = 0;
     }
   }
+  std::cout << "Number of non-linear iterations: " << integrator.non_lin_iter << std::endl;
 
   // Make times start from 0
   if (!simparams.output_all_cycles) {

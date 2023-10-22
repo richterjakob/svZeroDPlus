@@ -37,7 +37,8 @@ SparseSystem::SparseSystem() {}
 SparseSystem::SparseSystem(unsigned int n) {
   F = Eigen::SparseMatrix<double>(n, n);
   E = Eigen::SparseMatrix<double>(n, n);
-  D = Eigen::SparseMatrix<double>(n, n);
+  D1 = Eigen::SparseMatrix<double>(n, n);
+  D2 = Eigen::SparseMatrix<double>(n, n);
   C = Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(n);
 
   jacobian = Eigen::SparseMatrix<double>(n, n);
@@ -57,7 +58,7 @@ void SparseSystem::reserve(Model *model) {
   auto num_triplets = model->get_num_triplets();
   F.reserve(num_triplets["F"]);
   E.reserve(num_triplets["E"]);
-  D.reserve(num_triplets["D"]);
+  D1.reserve(num_triplets["D"]);
   model->update_constant(*this);
   model->update_time(*this, 0.0);
 
@@ -71,7 +72,8 @@ void SparseSystem::reserve(Model *model) {
 
   F.makeCompressed();
   E.makeCompressed();
-  D.makeCompressed();
+  D1.makeCompressed();
+  D2.makeCompressed();
   jacobian.reserve(num_triplets["F"] + num_triplets["E"]);  // Just an estimate
   update_jacobian(1.0);  // Update it once to have sparsity pattern
   jacobian.makeCompressed();
@@ -89,7 +91,7 @@ void SparseSystem::update_residual(
 
 void SparseSystem::update_jacobian(double e_coeff) {
   jacobian.setZero();
-  jacobian += F + D + E * e_coeff;
+  jacobian += F + D1 + (E + D2) * e_coeff;
 }
 
 void SparseSystem::solve() {

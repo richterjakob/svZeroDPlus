@@ -35,10 +35,14 @@ Integrator::Integrator(Model* model, double time_step_size, double rho,
   this->model = model;
   alpha_m = 0.5 * (3.0 - rho) / (1.0 + rho);
   alpha_f = 1.0 / (1.0 + rho);
+  std::cout << "alpha_m: " << alpha_m << std::endl;
+  std::cout << "alpha_f: " << alpha_f << std::endl;
   alpha_m_inv = 1.0 / alpha_m;
   alpha_f_inv = 1.0 / alpha_f;
   gamma = 0.5 + alpha_m - alpha_f;
   gamma_inv = 1.0 / gamma;
+
+  std::cout << "gamma: " << gamma << std::endl;
 
   y_init_coeff = alpha_f * 0.5 * time_step_size;
   ydot_init_coeff = (1.0 + alpha_m * ((gamma - 0.5) * gamma_inv - 1.0));
@@ -78,18 +82,24 @@ void Integrator::update_params(double time_step_size) {
   model->update_time(system, 0.0);
 }
 
-State Integrator::step(State& old_state, double time) {
-  // Predictor + initiator step
+State Integrator::step(State& state_n, double time) {
+  // Predictor step
+  // Eigen::Matrix<double, Eigen::Dynamic, 1> y_np = state_n.y;
+  // Eigen::Matrix<double, Eigen::Dynamic, 1> ydot_np = (gamma - 1.0) / gamma * state_n.ydot;
+
+  // Intiator step
   y_af.setZero();
   ydot_am.setZero();
-  y_af += old_state.y + old_state.ydot * y_init_coeff;
-  ydot_am += old_state.ydot * ydot_init_coeff;
+  // y_af += state_n.y; // + alpha_f * time_step_size * state_n.ydot;
+  // ydot_am += (gamma - 1.0) / gamma * state_n.ydot;
+  y_af += state_n.y + state_n.ydot * y_init_coeff;
+  ydot_am += state_n.ydot * ydot_init_coeff;
 
   // Determine new time
-  double new_time = time + alpha_f * time_step_size;
+  double time_f = time + alpha_f * time_step_size;
 
   // Update time-dependent element contributions in system
-  model->update_time(system, new_time);
+  model->update_time(system, time_f);
 
   for (size_t i = 0; i < max_iter; i++) {
     // Update solution-dependent element contribitions
@@ -106,6 +116,7 @@ State Integrator::step(State& old_state, double time) {
       throw std::runtime_error(
           "Maximum number of non-linear iterations reached.");
     }
+    non_lin_iter ++;
 
     // Determine jacobian
     system.update_jacobian(y_dot_coeff);
@@ -120,8 +131,8 @@ State Integrator::step(State& old_state, double time) {
 
   // Set new state
   State new_state = State::Zero(size);
-  new_state.y += old_state.y + (y_af - old_state.y) * alpha_f_inv;
-  new_state.ydot += old_state.ydot + (ydot_am - old_state.ydot) * alpha_m_inv;
+  new_state.y += state_n.y + (y_af - state_n.y) * alpha_f_inv;
+  new_state.ydot += state_n.ydot + (ydot_am - state_n.ydot) * alpha_m_inv;
 
   return new_state;
 }
