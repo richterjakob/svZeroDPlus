@@ -51,8 +51,7 @@ nlohmann::json calibrate(const nlohmann::json &config) {
       calibration_parameters.value("calibrate_capacitance", true);
   bool calibrate_stenosis =
       calibration_parameters.value("calibrate_stenosis_coefficient", true);
-  bool initialize_zero =
-      calibration_parameters.value("initialize_zero", false);
+  bool initialize_zero = calibration_parameters.value("initialize_zero", false);
   double lambda0 = calibration_parameters.value("initial_damping_factor", 1.0);
 
   // Collect parameters that are constant here
@@ -73,16 +72,15 @@ nlohmann::json calibrate(const nlohmann::json &config) {
 
     // Create parameter IDs
     std::vector<int> param_ids;
-    for (size_t k = 0; k < 4; k++)
-      param_ids.push_back(param_counter++);
+    for (size_t k = 0; k < 4; k++) param_ids.push_back(param_counter++);
     model.add_block(BlockType::BLOODVESSEL, param_ids, vessel_name);
     vessel_id_map.insert({vessel_config["vessel_id"], vessel_name});
     DEBUG_MSG("Created vessel " << vessel_name);
 
-    if (!calibrate_resistance) const_params[param_counter-4] = 0.0;
-    if (!calibrate_inductance) const_params[param_counter-3] = 0.0;
-    if (!calibrate_capacitance) const_params[param_counter-2] = 0.0;
-    if (!calibrate_stenosis) const_params[param_counter-1] = 0.0;
+    if (!calibrate_resistance) const_params[param_counter - 4] = 0.0;
+    if (!calibrate_inductance) const_params[param_counter - 3] = 0.0;
+    if (!calibrate_capacitance) const_params[param_counter - 2] = 0.0;
+    if (!calibrate_stenosis) const_params[param_counter - 1] = 0.0;
 
     // Read connected boundary conditions
     if (vessel_config.contains("boundary_conditions")) {
@@ -106,13 +104,13 @@ nlohmann::json calibrate(const nlohmann::json &config) {
       model.add_block(BlockType::JUNCTION, {}, junction_name);
     } else {
       std::vector<int> param_ids;
-      for (size_t i = 0; i < 3; i++)
-      {
-        for (size_t j = 0; j < num_outlets; j++)
-        {
-          if (!calibrate_resistance && i==0) const_params[param_counter] = 0.0;
-          if (!calibrate_inductance && i==1) const_params[param_counter] = 0.0;
-          if (!calibrate_stenosis && i==2) const_params[param_counter] = 0.0;
+      for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < num_outlets; j++) {
+          if (!calibrate_resistance && i == 0)
+            const_params[param_counter] = 0.0;
+          if (!calibrate_inductance && i == 1)
+            const_params[param_counter] = 0.0;
+          if (!calibrate_stenosis && i == 2) const_params[param_counter] = 0.0;
           param_ids.push_back(param_counter++);
         }
       }
@@ -199,7 +197,7 @@ nlohmann::json calibrate(const nlohmann::json &config) {
           vessel_config["zero_d_element_values"].value("L", 0.0);
       alpha[block->global_param_ids[3]] =
           vessel_config["zero_d_element_values"].value("stenosis_coefficient",
-                                                        0.0);
+                                                       0.0);
     }
     for (auto &junction_config : output_config["junctions"]) {
       std::string junction_name = junction_config["junction_name"];
@@ -239,9 +237,9 @@ nlohmann::json calibrate(const nlohmann::json &config) {
 
   // Run optimization
   DEBUG_MSG("Start optimization");
-  auto lm_alg =
-      LevenbergMarquardtOptimizer(&model, num_obs, param_counter, lambda0,
-                                  gradient_tol, increment_tol, max_iter, const_params);
+  auto lm_alg = LevenbergMarquardtOptimizer(
+      &model, num_obs, param_counter, lambda0, gradient_tol, increment_tol,
+      max_iter, const_params);
 
   alpha = lm_alg.run(alpha, y_all, dy_all);
 
@@ -276,8 +274,7 @@ nlohmann::json calibrate(const nlohmann::json &config) {
 
     std::vector<double> ste_values;
     for (size_t i = 0; i < num_outlets; i++) {
-      ste_values.push_back(
-          alpha[block->global_param_ids[i + 2 * num_outlets]]);
+      ste_values.push_back(alpha[block->global_param_ids[i + 2 * num_outlets]]);
     }
 
     junction_config["junction_type"] = "BloodVesselJunction";

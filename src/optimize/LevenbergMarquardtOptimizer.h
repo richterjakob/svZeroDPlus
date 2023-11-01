@@ -116,7 +116,8 @@ class LevenbergMarquardtOptimizer {
    */
   LevenbergMarquardtOptimizer(Model* model, int num_obs, int num_params,
                               double lambda0, double tol_grad, double tol_inc,
-                              int max_iter, std::map<int, double> &const_params);
+                              int max_iter,
+                              std::map<int, double>& const_params);
 
   /**
    * @brief Destroy the LevenbergMarquardtOptimizer object

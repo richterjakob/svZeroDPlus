@@ -34,7 +34,7 @@
 
 LevenbergMarquardtOptimizer::LevenbergMarquardtOptimizer(
     Model* model, int num_obs, int num_params, double lambda0, double tol_grad,
-    double tol_inc, int max_iter, std::map<int, double> &const_params) {
+    double tol_inc, int max_iter, std::map<int, double>& const_params) {
   this->model = model;
   this->num_obs = num_obs;
   this->num_params = num_params;
@@ -46,7 +46,8 @@ LevenbergMarquardtOptimizer::LevenbergMarquardtOptimizer(
   this->tol_inc = tol_inc;
   this->max_iter = max_iter;
   this->const_params = const_params;
-  for (size_t i = 0; i < num_params; i++) if (!const_params.count(i)) this->mask.push_back(i);
+  for (size_t i = 0; i < num_params; i++)
+    if (!const_params.count(i)) this->mask.push_back(i);
 
   jacobian = Eigen::SparseMatrix<double>(num_dpoints, num_params);
   residual = Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(num_dpoints);
@@ -54,10 +55,11 @@ LevenbergMarquardtOptimizer::LevenbergMarquardtOptimizer(
                                                               num_params);
   vec = Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(num_params);
   int num_non_constant = num_params - const_params.size();
-  mat_pruned = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(num_non_constant,
-                                                              num_non_constant);
+  mat_pruned = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(
+      num_non_constant, num_non_constant);
   vec_pruned = Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(num_non_constant);
-  delta_pruned = Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(num_non_constant);
+  delta_pruned =
+      Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(num_non_constant);
 }
 
 LevenbergMarquardtOptimizer::~LevenbergMarquardtOptimizer() {}
@@ -66,7 +68,7 @@ Eigen::Matrix<double, Eigen::Dynamic, 1> LevenbergMarquardtOptimizer::run(
     Eigen::Matrix<double, Eigen::Dynamic, 1> alpha,
     std::vector<std::vector<double>>& y_obs,
     std::vector<std::vector<double>>& dy_obs) {
-  for (auto &&[key, value] : const_params) alpha(key) = value;
+  for (auto&& [key, value] : const_params) alpha(key) = value;
   for (size_t i = 0; i < max_iter; i++) {
     update_gradient(alpha, y_obs, dy_obs);
 
@@ -133,7 +135,7 @@ void LevenbergMarquardtOptimizer::update_delta(bool first_step) {
       jacobian_sq.diagonal().asDiagonal();
   mat = jacobian_sq + lambda * jacobian_sq_diag;
 
-  mat_pruned = mat(mask,mask);
+  mat_pruned = mat(mask, mask);
   vec_pruned = vec(mask);
 
   // Solve for new delta
