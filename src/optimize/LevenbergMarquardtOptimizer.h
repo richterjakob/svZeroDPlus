@@ -112,10 +112,11 @@ class LevenbergMarquardtOptimizer {
    * @param tol_grad Gradient tolerance
    * @param tol_inc Parameter increment tolerance
    * @param max_iter Maximum iterations
+   * @param const_params Index-value pair of constant parameters
    */
   LevenbergMarquardtOptimizer(Model* model, int num_obs, int num_params,
                               double lambda0, double tol_grad, double tol_inc,
-                              int max_iter);
+                              int max_iter, std::map<int, double> &const_params);
 
   /**
    * @brief Destroy the LevenbergMarquardtOptimizer object
@@ -140,11 +141,15 @@ class LevenbergMarquardtOptimizer {
  private:
   Eigen::SparseMatrix<double> jacobian;
   Eigen::Matrix<double, Eigen::Dynamic, 1> residual;
-  Eigen::Matrix<double, Eigen::Dynamic, 1> delta;
+  Eigen::Matrix<double, Eigen::Dynamic, 1> delta_pruned;
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> mat;
   Eigen::Matrix<double, Eigen::Dynamic, 1> vec;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> mat_pruned;
+  Eigen::Matrix<double, Eigen::Dynamic, 1> vec_pruned;
   Model* model;
   double lambda;
+  std::map<int, double> const_params;
+  std::vector<int> mask;
 
   int num_obs;
   int num_params;
